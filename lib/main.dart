@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:form_poc/components/custom_input.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,7 +35,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: SubmitButtonAlwaysEnable(),
-      home: SubmitButtonDisabled(),
+      // home: SubmitButtonDisabled(),
+      home: CustomFormControl(),
     );
   }
 }
@@ -73,6 +75,11 @@ class SubmitButtonAlwaysEnable extends StatelessWidget {
               ),
               FormBuilderTextField(
                 name: 'emailField',
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                ),
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.email(),
                   FormBuilderValidators.required(),
@@ -220,6 +227,65 @@ class _SubmitButtonDisabledState extends State<SubmitButtonDisabled> {
               Text(_formKey.currentState == null ? 'Null' :_formKey.currentState?.errors.toString() == null ? 'No errors': _formKey.currentState!.errors.toString()),
 
               Text(isValid ? 'valid' : 'nope'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomFormControl extends StatelessWidget {
+  CustomFormControl({super.key});
+
+  final _formKey = GlobalKey<FormBuilderState>();
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Submit button always enabled')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FormBuilder(
+          key: _formKey,
+          child: Column(
+            children: [
+              FormBuilderField<String?>(
+                name: 'email',
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                  FormBuilderValidators.email(),
+                ]),
+                builder: (FormFieldState field) {
+                  print("\n\n\n");
+                  print("errorText");
+                  print(field.errorText);
+
+                  print("\nhasError");
+                  print(field.hasError);
+
+                  print("\nisValid");
+                  print(field.isValid);
+                  print("\n\n\n");
+                  return CustomInput(
+                    label: 'Email',
+                    error: field.errorText,
+                    onChange: (val) {
+                      field.didChange(val);
+                      field.validate();
+                    },
+                    value: field.value,
+                  );
+                },
+              ),
+
+              MaterialButton(
+                color: Colors.purpleAccent,
+                child: Text('Submit'),
+                onPressed: () {
+                _formKey.currentState?.saveAndValidate();
+              })
             ],
           ),
         ),
